@@ -4,8 +4,12 @@
         <script>console.log("D3 is running on version: " + d3.version);</script>
     </head>
 <body>
-Hello, world!
-<svg id = "chart1"></svg>
+    <p>TODO: Put introduction and discussion of first chart here.</p>
+    <svg id = "chart1"></svg>
+    <p>TODO: Put discussion of second chart here.</p>
+    <svg id = "chart2"></svg>
+    <p>TODO: Put discussion of third chart here.</p>
+    <svg id = "chart3"></svg>
 <script type = "module">
     //set chart dimensions, generally following https://d3js.org/getting-started
     const width = 800;
@@ -17,48 +21,58 @@ Hello, world!
     const chartWidth = width - marginRight - marginLeft;
     const chartHeight = height - marginTop - marginBottom;
 
-    const svgChart1 = d3.select("#chart1")
-        .attr("width", width).attr("height", height)
-        .append("g")
-        .attr("transform", "translate(" + marginLeft + ", " + marginTop + ")");
-
     const data = await d3.csv("UNRATE.csv");
 
-    console.log(data[0]);
-    console.log(typeof data[0].observation_date);
     //parse the date -- https://d3js.org/d3-time-format
     const dateFormat = d3.timeParse("%Y-%m-%d");
     data.forEach(d => {
         d.observation_date = dateFormat(d.observation_date);
     });
-    console.log(data[0].observation_date);
-    console.log(typeof data[0].observation_date);
 
-    const x = d3.scaleLinear()
-        .domain([0 , data.length - 1])
-        .range([0 , chartWidth])
+    function buildChart(idOfSvg, data, yearRange){
+        const minYear = yearRange.minYear;
+        const maxYear = yearRange.maxYear;
 
-    const y = d3.scaleLinear()
-        .domain([0 , 20])
-        .range([chartHeight , 0])
+        const filteredRange = data.filter(d =>
+            d.observation_date.getFullYear() >= minYear &&
+            d.observation_date.getFullYear() <= maxYear
+        );
 
-    //line helper function per https://d3-graph-gallery.com/graph/shape.html#myline
-    var lineXYParse = d3.line()
-        .x(function(d , i){return x(d.observation_date);})
-        .y(function(d , i){return y(d.UNRATE);})
+        const svg = d3.select("#" + idOfSvg)
+            .attr("width", width).attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + marginLeft + ", " + marginTop + ")");
 
-    svgChart1.append('path')
-        .datum(data)
-        .attr('d', lineXYParse)
-        .attr('stroke', 'black')
-        .attr('fill','none');
+        const x = d3.scaleTime()
+            .domain([d3.min(filteredRange, d => d.observation_date), d3.max(filteredRange, d => d.observation_date)])
+            .range([0 , chartWidth])
 
-    svgChart1.append("g")
-        .attr("transform", "translate(0, " + chartHeight + ")")
-        .call(d3.axisBottom(x))
+        const y = d3.scaleLinear()
+            .domain([0 , 20])
+            .range([chartHeight , 0])
+
+        //line helper function per https://d3-graph-gallery.com/graph/shape.html#myline
+        var lineXYParse = d3.line()
+            .x(function(d , i){return x(d.observation_date);})
+            .y(function(d , i){return y(d.UNRATE);})
+
+        svg.append('path')
+            .datum(filteredRange)
+            .attr('d', lineXYParse)
+            .attr('stroke', 'black')
+            .attr('fill','none');
+
+        svg.append("g")
+            .attr("transform", "translate(0, " + chartHeight + ")")
+            .call(d3.axisBottom(x));
     
-    svgChart1.append("g")
-        .call(d3.axisLeft(y));
+        svg.append("g")
+            .call(d3.axisLeft(y));
+    }
+
+    buildChart("chart1", data, {minYear:1948,maxYear:2026});
+    buildChart("chart2", data, {minYear:1948,maxYear:2026});
+    buildChart("chart3", data, {minYear:1948,maxYear:2026});
 
 </script>
 </body>
