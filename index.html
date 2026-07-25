@@ -24,6 +24,16 @@ Hello, world!
 
     const data = await d3.csv("UNRATE.csv");
 
+    console.log(data[0]);
+    console.log(typeof data[0].observation_date);
+    //parse the date -- https://d3js.org/d3-time-format
+    const dateFormat = d3.timeParse("%Y-%m-%d");
+    data.forEach(d => {
+        d.observation_date = dateFormat(d.observation_date);
+    });
+    console.log(data[0].observation_date);
+    console.log(typeof data[0].observation_date);
+
     const x = d3.scaleLinear()
         .domain([0 , data.length - 1])
         .range([0 , chartWidth])
@@ -34,7 +44,7 @@ Hello, world!
 
     //line helper function per https://d3-graph-gallery.com/graph/shape.html#myline
     var lineXYParse = d3.line()
-        .x(function(d , i){return x(i);})
+        .x(function(d , i){return x(d.observation_date);})
         .y(function(d , i){return y(d.UNRATE);})
 
     svgChart1.append('path')
