@@ -24,7 +24,7 @@
     const marginTop = 40;
     const marginRight = 40;
     const marginBottom = 40;
-    const marginLeft = 40;
+    const marginLeft = 80;
     const chartWidth = width - marginRight - marginLeft;
     const chartHeight = height - marginTop - marginBottom;
 
@@ -38,7 +38,15 @@
         d.UNRATE = +d.UNRATE;
     });
 
-    function buildChart(idOfSvg, data, yearRange, annotations){
+    function findAnnotationRecord(data, year, month) {
+        //for find() = https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+        return data.find(d =>
+            d.observation_date.getFullYear() == year &&
+            d.observation_date.getMonth() == month
+        );
+    }
+
+    function buildChart(idOfSvg, data, yearRange, annotationInfo){
         const minYear = yearRange.minYear;
         const maxYear = yearRange.maxYear;
 
@@ -126,30 +134,67 @@
         }
 
         //annotations
+
+        const annotations = [];
+
+        for (let i = 0; i < annotationInfo.length; i++){
+            const infoContents = annotationInfo[i];
+            const record = findAnnotationRecord(filteredRange, infoContents.year, infoContents.month);
+
+            annotations.push(
+                {
+                    note: {
+                        label: infoContents.label,
+                        title: infoContents.title
+                    },
+                    x: x(record.observation_date),
+                    y: y(record.UNRATE),
+                    dx: infoContents.dx,
+                    dy: infoContents.dy
+                } 
+            )
+        }
+
         const addAnnotations = d3.annotation()
             .annotations(annotations);
             
         svg.append("g")
             .attr("class", "annotation-group")
             .call(addAnnotations);
+
+        //axis labels per https://stackoverflow.com/questions/11189284/d3-axis-labeling
+        svg.append("text")
+            .attr("class", "x label")
+            .attr("x", chartWidth / 2)
+            .attr("y", chartHeight + 35)
+            .text("Date");
+
+        svg.append("text")
+            .attr("class", "y label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -chartHeight / 2 - 100)
+            .attr("y", - 30)
+            .text("Unemployment Rate in the US");
     }
 
+    //define annotations here with year, month, label, title, and dx and dy offsets
     const chart1Annotations = [
-        {
-            note: {
-                label: "Nov 1988 -- Adam Born",
-                title: "Adam's Birthday"
-            },
-            x: x(filteredRange[100].observation_date),
-            y: y(filteredRange[100].UNRATE),
-            dy: 10,
-            dx: 10
-        }   
+        { year: 1988, month: 10, label: "Adam Born", title: "Nov 1988", dx : 10, dy: 50 }, //months appear to be 0 indexed
+        { year: 2011, month: 4,  label: "Undergrad Graduation", title: "May 2011", dx : 10, dy: -50 } 
+    ];
+
+    const chart2Annotations = [
+        { year: 1988, month: 10, label: "Adam Born", title: "Nov 1988",  dx : 10, dy: 50 },
+        { year: 2020, month: 3, label: "COVID-19 CA Lockdowns Start", title: "Mar 2020",  dx : 10, dy: -10 }
+
+    ];
+
+    const chart3Annotations = [
     ];
 
     buildChart("chart1", data, {minYear:1985,maxYear:2014}, chart1Annotations);
-    buildChart("chart2", data, {minYear:1985,maxYear:2023}, []);
-    buildChart("chart3", data, {minYear:1948,maxYear:2026}, []);
+    buildChart("chart2", data, {minYear:1985,maxYear:2023}, chart2Annotations);
+    buildChart("chart3", data, {minYear:1948,maxYear:2026}, chart3Annotations);
 
 </script>
 </body>
