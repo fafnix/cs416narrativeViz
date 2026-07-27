@@ -38,7 +38,7 @@
         d.UNRATE = +d.UNRATE;
     });
 
-    function buildChart(idOfSvg, data, yearRange){
+    function buildChart(idOfSvg, data, yearRange, annotations){
         const minYear = yearRange.minYear;
         const maxYear = yearRange.maxYear;
 
@@ -126,19 +126,6 @@
         }
 
         //annotations
-        const annotations = [
-            {
-                note: {
-                    label: "Nov 1988 -- Adam Born",
-                    title: "Adam's Birthday"
-                },
-                x: x(filteredRange[100].observation_date),
-                y: y(filteredRange[100].UNRATE),
-                dy: 10,
-                dx: 10
-            }   
-        ];
-
         const addAnnotations = d3.annotation()
             .annotations(annotations);
             
@@ -147,9 +134,22 @@
             .call(addAnnotations);
     }
 
-    buildChart("chart1", data, {minYear:1985,maxYear:2014});
-    buildChart("chart2", data, {minYear:1985,maxYear:2023});
-    buildChart("chart3", data, {minYear:1948,maxYear:2026});
+    const chart1Annotations = [
+        {
+            note: {
+                label: "Nov 1988 -- Adam Born",
+                title: "Adam's Birthday"
+            },
+            x: x(filteredRange[100].observation_date),
+            y: y(filteredRange[100].UNRATE),
+            dy: 10,
+            dx: 10
+        }   
+    ];
+
+    buildChart("chart1", data, {minYear:1985,maxYear:2014}, chart1Annotations);
+    buildChart("chart2", data, {minYear:1985,maxYear:2023}, []);
+    buildChart("chart3", data, {minYear:1948,maxYear:2026}, []);
 
 </script>
 </body>
