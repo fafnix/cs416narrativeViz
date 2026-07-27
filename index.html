@@ -2,6 +2,8 @@
     <head>
         <script src='https://d3js.org/d3.v7.min.js'></script>
         <script>console.log("D3 is running on version: " + d3.version);</script>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+        <script>console.log("D3-Annotation is loaded: " + (typeof d3.annotation == "function"));</script>
     </head>
 <body>
     <p>TODO: Put introduction and discussion of first chart here.</p>
@@ -11,7 +13,7 @@
     <p>TODO: Put discussion of third chart here.</p>
     <svg id = "chart3"></svg>
 
-    //hove-over tooltip to just show x and y values on line
+    <!-- hove-over tooltip to just show x and y values on line-->
     <div id="tooltip" style="position: absolute; opacity: 0; background: lightgrey; border: 1px solid black; pointer-events: none; font-size: 12px;"></div>
 
 
@@ -83,7 +85,7 @@
         var circleOfFocus = svg.append('circle')
             .style("fill", "none")
             .attr("stroke", "black")
-            .attr("r", 2)
+            .attr("r", 3)
             .style("opacity", 0);
 
         var tooltipXy = d3.select("#tooltip");
@@ -122,10 +124,31 @@
             circleOfFocus.style("opacity", 0);
             tooltipXy.style("opacity", 0);
         }
+
+        //annotations
+        const annotations = [
+            {
+                note: {
+                    label: "Nov 1988 -- Adam Born",
+                    title: "Adam's Birthday"
+                },
+                x: x(filteredRange[100].observation_date),
+                y: y(filteredRange[100].UNRATE),
+                dy: 10,
+                dx: 10
+            }   
+        ];
+
+        const addAnnotations = d3.annotation()
+            .annotations(annotations);
+            
+        svg.append("g")
+            .attr("class", "annotation-group")
+            .call(addAnnotations);
     }
 
-    buildChart("chart1", data, {minYear:1948,maxYear:2026});
-    buildChart("chart2", data, {minYear:1948,maxYear:2026});
+    buildChart("chart1", data, {minYear:1985,maxYear:2014});
+    buildChart("chart2", data, {minYear:1985,maxYear:2023});
     buildChart("chart3", data, {minYear:1948,maxYear:2026});
 
 </script>
