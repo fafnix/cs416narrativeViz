@@ -10,6 +10,11 @@
     <svg id = "chart2"></svg>
     <p>TODO: Put discussion of third chart here.</p>
     <svg id = "chart3"></svg>
+
+    //hove-over tooltip to just show x and y values on line
+    <div id="tooltip" style="position: absolute; opacity: 0; background: lightgrey; border: 1px solid black; pointer-events: none; font-size: 12px;"></div>
+
+
 <script type = "module">
     //set chart dimensions, generally following https://d3js.org/getting-started
     const width = 800;
@@ -27,6 +32,8 @@
     const dateFormat = d3.timeParse("%Y-%m-%d");
     data.forEach(d => {
         d.observation_date = dateFormat(d.observation_date);
+        //max for UNRATE was wrong (string instead of numerical) until -- https://stackoverflow.com/questions/49406725/d3-max-not-returning-the-max-value-in-an-array
+        d.UNRATE = +d.UNRATE;
     });
 
     function buildChart(idOfSvg, data, yearRange){
@@ -48,7 +55,7 @@
             .range([0 , chartWidth])
 
         const y = d3.scaleLinear()
-            .domain([0 , 20])
+            .domain([0 , d3.max(filteredRange, d => d.UNRATE) * 1.2])
             .range([chartHeight , 0])
 
         //line helper function per https://d3-graph-gallery.com/graph/shape.html#myline
@@ -68,6 +75,53 @@
     
         svg.append("g")
             .call(d3.axisLeft(y));
+
+        //following https://d3-graph-gallery.com/graph/line_cursor.html
+        //to add ability to hover over chart and see x and y values from line
+        var bisect = d3.bisector(function(d){return d.observation_date;}).left;
+
+        var circleOfFocus = svg.append('circle')
+            .style("fill", "none")
+            .attr("stroke", "black")
+            .attr("r", 2)
+            .style("opacity", 0);
+
+        var tooltipXy = d3.select("#tooltip");
+
+        svg
+            .append('rect')
+            .style("fill", "none")
+            .style("pointer-events", "all")
+            .attr('width', chartWidth)
+            .attr('height', chartHeight)
+            .on('mouseover', mouseover)
+            .on('mousemove', mousemove)
+            .on('mouseout', mouseout);
+        
+        function mouseover() {
+            circleOfFocus.style("opacity", 1);
+            tooltipXy.style("opacity", 1);
+        }
+
+        function mousemove(event) {
+            var x0 = x.invert(d3.pointer(event)[0]);
+            var i = bisect(filteredRange, x0, 1);
+            const selectedData = filteredRange[i];
+
+            circleOfFocus
+                .attr("cx", x(selectedData.observation_date))
+                .attr("cy", y(selectedData.UNRATE));
+
+            tooltipXy
+                .html("Date: " + selectedData.observation_date.toDateString() + "<br>Unemployment Rate: " + selectedData.UNRATE + "%")
+                .style("left", (event.pageX + 15) + "px")
+                .style("top", (event.pageY - 30) + "px");
+        }
+
+        function mouseout() {
+            circleOfFocus.style("opacity", 0);
+            tooltipXy.style("opacity", 0);
+        }
     }
 
     buildChart("chart1", data, {minYear:1948,maxYear:2026});
