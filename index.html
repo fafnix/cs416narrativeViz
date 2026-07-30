@@ -4,6 +4,17 @@
         <script>console.log("D3 is running on version: " + d3.version);</script>
         <script src = "https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
         <script>console.log("D3-Annotation is loaded: " + (typeof d3.annotation == "function"));</script>
+        <!-- set styling for annotations, mirror what is used for consisten formatting -->
+        <style>
+            .annotation-note-label {
+                font-family: Arial, Calibri;
+                font-size: 12px;
+            }
+            .annotation-note-title {
+                font-family: Arial, Calibri;
+                font-size: 20px;
+            }
+        </style>
     </head>
 <body>
     <p>TODO: Put introduction and discussion of first chart here.</p>
@@ -27,6 +38,13 @@
     const marginLeft = 80;
     const chartWidth = width - marginRight - marginLeft;
     const chartHeight = height - marginTop - marginBottom;
+
+    //for consistent formatting
+    const fontFamily = "Arial, Calibri";
+    const axisFontSize = "12px";
+    const titleFontSize = "20px";
+    const lineColor = "darkslategrey";
+    const textColor = "black";
 
     const data = await d3.csv("UNRATE.csv");
 
@@ -76,15 +94,23 @@
         svg.append('path')
             .datum(filteredRange)
             .attr('d', lineXYParse)
-            .attr('stroke', 'black')
+            .attr('stroke', lineColor)
             .attr('fill','none');
 
         svg.append("g")
             .attr("transform", "translate(0, " + chartHeight + ")")
-            .call(d3.axisBottom(x));
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .style("font-family", fontFamily)
+            .style("font-size", axisFontSize)
+            .style("fill", textColor);
     
         svg.append("g")
-            .call(d3.axisLeft(y));
+            .call(d3.axisLeft(y))
+            .selectAll("text")
+            .style("font-family", fontFamily)
+            .style("font-size", axisFontSize)
+            .style("fill", textColor);
 
         //following https://d3-graph-gallery.com/graph/line_cursor.html
         //to add ability to hover over chart and see x and y values from line
@@ -92,7 +118,7 @@
 
         var circleOfFocus = svg.append('circle')
             .style("fill", "none")
-            .attr("stroke", "black")
+            .attr("stroke", textColor) //technically not text but for contrast
             .attr("r", 3)
             .style("opacity", 0);
 
@@ -147,6 +173,7 @@
                         label: infoContents.label,
                         title: infoContents.title
                     },
+                    color: "dimgrey",
                     x: x(record.observation_date),
                     y: y(record.UNRATE),
                     dx: infoContents.dx,
@@ -167,6 +194,9 @@
             .attr("class", "x label")
             .attr("x", chartWidth / 2)
             .attr("y", chartHeight + 35)
+            .style("font-family", fontFamily)
+            .style("font-size", axisFontSize)
+            .style("fill", textColor)
             .text("Date");
 
         svg.append("text")
@@ -174,6 +204,9 @@
             .attr("transform", "rotate(-90)")
             .attr("x", -chartHeight / 2 - 100)
             .attr("y", - 30)
+            .style("font-family", fontFamily)
+            .style("font-size", axisFontSize)
+            .style("fill", textColor)
             .text("Unemployment Rate in the US");
     }
 
@@ -194,6 +227,12 @@
     buildChart("chart1", data, {minYear:1985,maxYear:2014}, chart1Annotations);
     buildChart("chart2", data, {minYear:1985,maxYear:2023}, chart2Annotations);
     buildChart("chart3", data, {minYear:1948,maxYear:2026}, chart3Annotations);
+
+    //applying same styling to paragraphs
+    d3.selectAll("p")
+        .style("font-family", fontFamily)
+        .style("font-size", axisFontSize)
+        .style("color", textColor);
 
 </script>
 </body>
