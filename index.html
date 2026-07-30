@@ -4,7 +4,7 @@
         <script>console.log("D3 is running on version: " + d3.version);</script>
         <script src = "https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
         <script>console.log("D3-Annotation is loaded: " + (typeof d3.annotation == "function"));</script>
-        <!-- set styling for annotations, mirror what is used for consisten formatting -->
+        <!-- set styling for annotations, manually mirror what is set in script below for consistency -->
         <style>
             .annotation-note-label {
                 font-family: Arial, Calibri;
@@ -12,12 +12,23 @@
             }
             .annotation-note-title {
                 font-family: Arial, Calibri;
-                font-size: 20px;
+                font-size: 14px;
             }
         </style>
     </head>
 <body>
-    <p>TODO: Put introduction and discussion of first chart here.</p>
+    <head>Exploring Major Milestones in Adam's Life <br>Using Federal Reserve Unemployment Data</head>
+    <p>I earned my undergraduate degree in May of 2011.  Although I graduated from a well-known university
+        (UC Berkeley, go bears!), I struggled to find my first job.
+        <br><br>After moving back into my parents' house,
+        I took up part-time dog training with someone who had previously trained my dogs.  It is still a story 
+        which elicits interest to this day, but it definitely was not where I expected to land.
+        <br><br>
+        When trying to understand why I was struggling, I was told time and again that I was living 
+        through the effects of a once-in-a-lifetime recession and the ensuing unemployment effects.
+        <br><br>
+        According to Wikipedia, the <a href = "https://en.wikipedia.org/wiki/Great_Recession">Great Recession</a>
+    </p>
     <svg id = "chart1"></svg>
     <p>TODO: Put discussion of second chart here.</p>
     <svg id = "chart2"></svg>
@@ -64,7 +75,7 @@
         );
     }
 
-    function buildChart(idOfSvg, data, yearRange, annotationInfo){
+    function buildChart(idOfSvg, data, yearRange, annotationInfo, title){
         const minYear = yearRange.minYear;
         const maxYear = yearRange.maxYear;
 
@@ -111,6 +122,17 @@
             .style("font-family", fontFamily)
             .style("font-size", axisFontSize)
             .style("fill", textColor);
+
+        svg.append("text")
+            .attr("class", "chart-title")
+            .attr("x", chartWidth / 2)
+            .attr("y", -15)
+            .attr("text-anchor", "middle")
+            .style("font-family", fontFamily)
+            .style("font-size", titleFontSize)
+            .style("font-weight", "bold")
+            .style("fill", textColor)
+            .text(title);
 
         //following https://d3-graph-gallery.com/graph/line_cursor.html
         //to add ability to hover over chart and see x and y values from line
@@ -213,20 +235,25 @@
     //define annotations here with year, month, label, title, and dx and dy offsets
     const chart1Annotations = [
         { year: 1988, month: 10, label: "Adam Born", title: "Nov 1988", dx : 10, dy: 50 }, //months appear to be 0 indexed
+        { year: 2007, month: 11, label: "Start of Great Recession", title: "Dec 2007", dx : 10, dy: 50 }, //per https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States
+        { year: 2009, month: 5, label: "End of Great Recession", title: "June 2009", dx : -10, dy: -50 },
         { year: 2011, month: 4,  label: "Undergrad Graduation", title: "May 2011", dx : 10, dy: -50 } 
     ];
 
     const chart2Annotations = [
         { year: 1988, month: 10, label: "Adam Born", title: "Nov 1988",  dx : 10, dy: 50 },
-        { year: 2020, month: 3, label: "COVID-19 California Lockdowns Start", title: "Mar 2020",  dx : -10, dy: -10 }
+        { year: 2007, month: 11, label: "Start of Great Recession", title: "Dec 2007", dx : 10, dy: 50 }, //per https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States
+        { year: 2009, month: 5, label: "End of Great Recession", title: "June 2009", dx : -10, dy: -50 },
+        { year: 2020, month: 3, label: "COVID-19 California Lockdowns Start", title: "Mar 2020",  dx : -10, dy: -10 },
+        { year: 2020, month: 5, label: "Adam Gets Married During Lockdowns", title: "June 2020", dx : 10, dy: -50 }
     ];
 
     const chart3Annotations = [
     ];
 
-    buildChart("chart1", data, {minYear:1985,maxYear:2014}, chart1Annotations);
-    buildChart("chart2", data, {minYear:1985,maxYear:2023}, chart2Annotations);
-    buildChart("chart3", data, {minYear:1948,maxYear:2026}, chart3Annotations);
+    buildChart("chart1", data, {minYear:1985,maxYear:2015}, chart1Annotations, "US Unemployment Rate: Great Recession");
+    buildChart("chart2", data, {minYear:1985,maxYear:2026}, chart2Annotations, "US Unemployment Rate: COVID");
+    buildChart("chart3", data, {minYear:1948,maxYear:2026}, chart3Annotations, "US Unemployment Rate: Set Your Own Time Frame");
 
     //applying same styling to paragraphs
     d3.selectAll("p")
