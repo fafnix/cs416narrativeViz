@@ -28,10 +28,10 @@
         through the effects of a once-in-a-lifetime recession and the ensuing unemployment effects.
         <br><br>
         According to Wikipedia, the <a href = "https://en.wikipedia.org/wiki/Great_Recession">Great Recession</a>
-        was from December 2007 through June 2009, with unemployment peaking in October of 2009.
+        was from December 2007 through June 2009, with unemployment peaking in October of 2009 at 10%.
         <br><br>
         Graduating in 2011 meant trying to enter the workplace while unemployment rates had still 
-        not returned to the pre-December 2007 rates, and going through these data validate some of
+        not returned to the pre-December 2007 rates, still at 9%.  Going through these data validate some of
         the difficulty I felt and lived through.
     </p>
     <svg id = "chart1"></svg>
@@ -54,7 +54,15 @@
         <br><br>
         Use the drop downs below to filter for a date range and hover over the chart for more detailed
         information.
+        <br><br>
+        Note that if you select a To year that is less than the From year, the chart will just display
+        the From year.
     </p>
+    <label for = "minYearDropdown">From:</label>
+    <select id = "minYearDropdown"></select>
+
+    <label for = "maxYearDropdown">To:</label>
+    <select id = "maxYearDropdown"></select>
     <svg id = "chart3"></svg>
 
     <p>Unemployment data from <a href='https://fred.stlouisfed.org/series/UNRATE'>Federal Reserve Bank of St. Louis</a>.
@@ -83,6 +91,12 @@
     const titleFontSize = "20px";
     const lineColor = "darkslategrey";
     const textColor = "black";
+
+    //mirroring https://www.freecodecamp.org/news/javascript-range-create-an-array-of-numbers-with-the-from-method/
+    const yearRangeForFilters = Array.from(
+        {length: (2026 - 1948) / 1 + 1},
+        (value, index) => 1948 + index * 1
+    );
 
     const data = await d3.csv("UNRATE.csv");
 
@@ -259,6 +273,22 @@
             .text("Unemployment Rate in the US");
     }
 
+    //now function to update chart 3 based on dropdowns
+    function updateScene3() {
+        const minYear = +d3.select("#minYearDropdown").property("value");
+        let maxYear = +d3.select("#maxYearDropdown").property("value");
+
+        //if max year is invalid (less than min) then just show min
+        if (maxYear < minYear) {
+            maxYear = minYear;
+        }
+
+        //https://stackoverflow.com/questions/14422198/how-do-i-remove-all-children-elements-from-a-node-and-then-apply-them-again-with
+        d3.select("#chart3").selectAll("*").remove();
+
+        buildChart("chart3", data, {minYear, maxYear}, chart3Annotations, "US Unemployment Rate: Set Your Own Time Frame");
+    }
+
     //define annotations here with year, month, label, title, and dx and dy offsets
     const chart1Annotations = [
         { year: 1988, month: 10, label: "Adam Born", title: "Nov 1988", dx : 10, dy: 50 }, //months appear to be 0 indexed
@@ -281,6 +311,32 @@
     buildChart("chart1", data, {minYear:1985,maxYear:2015}, chart1Annotations, "US Unemployment Rate: Great Recession");
     buildChart("chart2", data, {minYear:1985,maxYear:2026}, chart2Annotations, "US Unemployment Rate: COVID");
     buildChart("chart3", data, {minYear:1948,maxYear:2026}, chart3Annotations, "US Unemployment Rate: Set Your Own Time Frame");
+
+    //now update selectors for chart 3 with full year range
+    //https://stackoverflow.com/questions/68882113/changing-data-using-an-interactive-dropdown-to-feed-a-filter-in-d3-js
+    d3.select("#minYearDropdown")
+        .selectAll("option")
+        .data(yearRangeForFilters)
+        .enter()
+        .append("option")
+        .attr("value", d => d)
+        .text(d => d);
+
+    d3.select("#maxYearDropdown")
+        .selectAll("option")
+        .data(yearRangeForFilters)
+        .enter()
+        .append("option")
+        .attr("value", d => d)
+        .text(d => d);
+
+    //show max year by default
+    d3.select("#maxYearDropdown").property("value", 2026);
+    
+    //and listeners for changes in the dropdown
+    d3.select("#minYearDropdown").on("change", updateScene3);
+    d3.select("#maxYearDropdown").on("change", updateScene3);
+
 
     //applying same styling to paragraphs
     d3.selectAll("p")
