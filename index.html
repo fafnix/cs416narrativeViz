@@ -40,11 +40,11 @@
         would become the second, large recession of my adult life.
         <br><br>
         Although I was employed for this recession, there would be two major impacts to my life.
-        First, my fiancée and I had planned to get marred in June of 2020.  Although we still held a small ceremony, our larger
+        First, my fiancée and I had planned to get married in June of 2020.  Although we still held a small ceremony, our larger
         ceremony in Half Moon Bay, California was postponed by the <a href="https://en.wikipedia.org/wiki/COVID-19_pandemic_in_California">California lockdowns</a>
-         and then canceled.  The partial refuends and effects on vendors were mirrored in the larger economy, 
-         with unemployment rates peaking in March of 2020 at 14.8%.
-        <br></br>
+         and then canceled.  The partial refunds and effects on vendors were mirrored in the larger economy, 
+         with unemployment rates peaking in April of 2020 at 14.8%.
+        <br><br>
         The second impact was my now wife and I would both be affected by layoffs in 2023 as well.  Layoffs which the company
         which employed both of us tied to overhiring towards the end of the COVID-19 pandemic.
     </p>
@@ -66,10 +66,10 @@
     <br>
     <svg id = "chart3"></svg>
 
-    <p>Unemployment data from <a href='https://fred.stlouisfed.org/series/UNRATE'>Federal Reserve Bank of St. Louis</a>.
+    <p><i>Unemployment data from <a href='https://fred.stlouisfed.org/series/UNRATE'>Federal Reserve Bank of St. Louis</a>.
     Missing October 2025 unemployment data was filled in with the average of the surrounding months
-    to enable more seemless charting.
-    </p>
+    to enable more seamless charting.
+    </i></p>
 
     <!-- hover-over tooltip to just show x and y values on line-->
     <div id="tooltip" style="position: absolute; opacity: 0; background: lightgrey; border: 1px solid black; pointer-events: none; font-size: 12px;"></div>
@@ -302,9 +302,9 @@
         { year: 1988, month: 10, label: "Adam Born, Unemployment = 5.3%", title: "Nov 1988",  dx : 10, dy: 50 },
         { year: 2007, month: 11, label: "Start of Great Recession, Unemployment = 5%", title: "Dec 2007", dx : 10, dy: 50 }, //per https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States
         { year: 2009, month: 5, label: "End of Great Recession, Unemployment = 9.5%", title: "June 2009", dx : -10, dy: -50 },
-        { year: 2020, month: 3, label: "COVID-19 California Lockdowns Start, Unemployment = 14.8%", title: "Mar 2020",  dx : -10, dy: -10 },
+        { year: 2020, month: 2, label: "COVID-19 California Lockdowns Start, Unemployment = 4.4%", title: "Mar 2020",  dx : -10, dy: -120 },
         { year: 2020, month: 5, label: "Adam Gets Married During Lockdowns, Unemployment = 11%", title: "June 2020", dx : 10, dy: -50 },
-        { year: 2023, month: 4, label: "Layoffs for Adam and Wife (blamed on COVID overhiring), Unemployment = 3.6%", title: "May 2023", dx : 10, dy: -50 }
+        { year: 2023, month: 4, label: "Layoffs (blamed on COVID overhiring), Unemployment = 3.6%", title: "May 2023", dx : -5, dy: 20 }
     ];
 
     const chart3Annotations = [
